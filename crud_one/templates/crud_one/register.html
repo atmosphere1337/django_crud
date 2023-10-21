@@ -1,3 +1,9 @@
 <div>
 	Register Page
 </div>
+<form method="POST" action="register/process">
+	{% csrf_token %}
+	<table>{{ form.as_table }}</table>
+	<input type="submit"><br/>
+<form>
+

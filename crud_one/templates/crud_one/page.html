@@ -1,24 +1,29 @@
 <div>
 	Main Page
 </div>
+
+{% if messages %}
+	{% for message in messages %}
+		<div>
+			{{ message }}
+		</div>
+	{% endfor %}
+{% endif %}
+
+<div>Auth is {{ id }} </div>
 <form method="POST" action="page/create">
 	{% csrf_token %}
-	<input name="city"><br>
-	<input name="country"><br>
-	<input name="population"><br>
+	<table> {{ form_create.as_table }} </table>
 	<input type="submit" value="Add"><br>
 </form>
-<form method="POST" action="page/delete">
+<form method="POST" action="page/delete" >
 	{% csrf_token %}
-	<input name="id"><br>
+	<table>{{ form_delete.as_table }}</table>
 	<input type="submit" value="Delete"><br>
 </form>
 <form method="POST" action="page/update">
 	{% csrf_token %}
-	<input name="id"><br>
-	<input name="city"><br>
-	<input name="country"><br>
-	<input name="population"><br>
+	<table>{{ form_update }}</table>
 	<input type="submit" value="Update"><br>
 </form>
 <table border="1">
@@ -37,3 +42,5 @@
 	</tr>
 	{% endfor %}
 </table>
+
+<a href="logout">Logout</a>

@@ -1,29 +1,60 @@
-from django.shortcuts import render, redirect    #
+from django.shortcuts import render, redirect #
 from django.http import HttpResponse
-from crud_one.models import City       #
+from crud_one.models import City        	  #
+from .forms import *              			  #
+from django.contrib.auth.models import User   #
+from django.contrib.auth import login, authenticate, logout   #
+from django.contrib import messages                  #
+from django.contrib.auth.decorators import login_required   #
 
 def main(request):
 	return HttpResponse('Crud_one')
 
-def login(request):
-	return render(request, 'crud_one/login.html')
+def login_c(request):
+	return render(request, 'crud_one/login.html', {'form': UserForm})
 
 def login_process(request):
-	return HttpResponse('login_process')
+	if request.POST:
+		login_str = request.POST.get('login')
+		password = request.POST['password']
+		model = authenticate(username=login_str, password=password)
+		if model is not None:
+			login(request, model)
+			messages.info(request, f"Welcome, {login_str}")
+			return redirect('page')
+		else:
+			messages.error(request, "Wrong login or password")
+			return redirect('login')
+	return redirect('login')
 	
 def register(request):
-	return render(request, 'crud_one/register.html')
-	
+	return render(request, 'crud_one/register.html', {'form': UserForm})
+
 def register_process(request):
-	return HttpResponse('register_process')
+	if request.POST:
+		login = request.POST.get('login')
+		password = request.POST['password']
+		User.objects.create_user(username=login, password=password)
+	return redirect('login')	
+
+
+@login_required
+def logout_c(request):
+	logout(request)
+	return redirect('login')
 	
-def logout(request):
-	return HttpResponse('logout_process')
-	
+@login_required
 def page(request):
 	allModels = City.objects.all()
-	return render(request, 'crud_one/page.html', {'data': allModels})
+	output = {}
+	output['data'] = allModels 
+	output['form_create'] = CityCreateForm 
+	output['form_update'] = CityUpdateForm
+	output['form_delete'] = CityDeleteForm
+	output['id'] = request.user.id
+	return render(request, 'crud_one/page.html', output)
 
+@login_required
 def page_create(request):
 	if request.POST:
 		city = request.POST.get('city')
@@ -33,6 +64,7 @@ def page_create(request):
 		model.save()
 	return redirect('page')
 	
+@login_required
 def page_update(request):
 	if request.POST:
 		id = request.POST.get('id')
@@ -46,6 +78,7 @@ def page_update(request):
 		model.save()
 	return redirect('page')
 	
+@login_required
 def page_delete(request):
 	if request.POST:
 		id = request.POST.get('id')
