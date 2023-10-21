@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect    #
 from django.http import HttpResponse
+from crud_one.models import City       #
 
 def main(request):
 	return HttpResponse('Crud_one')
@@ -20,19 +21,40 @@ def logout(request):
 	return HttpResponse('logout_process')
 	
 def page(request):
-	return render(request, 'curd_one/page.html')
+	allModels = City.objects.all()
+	return render(request, 'crud_one/page.html', {'data': allModels})
 
 def page_create(request):
-	return HttpResponse('page_create_process')
+	if request.POST:
+		city = request.POST.get('city')
+		country = request.POST['country']
+		population = request.POST['population']
+		model = City(city=city, country=country, population=population, owner=0)	
+		model.save()
+	return redirect('page')
 	
 def page_update(request):
-	return HttpResponse('page_update_process')
+	if request.POST:
+		id = request.POST.get('id')
+		city = request.POST.get('city')
+		country = request.POST['country']
+		population = request.POST['population']
+		model = City.objects.get(id=id)	
+		model.city = city
+		model.country = country
+		model.population = population
+		model.save()
+	return redirect('page')
 	
 def page_delete(request):
-	return HttpResponse('page_delete_process')
+	if request.POST:
+		id = request.POST.get('id')
+		model = City.objects.filter(id=id)	
+		model.delete()
+	return redirect('page')
 	
 def admin(request):
-	return render(request, 'curd_one/admin.html')
+	return render(request, 'crud_one/admin.html')
 
 def admin_process(request):
 	return HttpResponse('admin_process')
