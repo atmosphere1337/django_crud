@@ -5,7 +5,7 @@ from .forms import *              			  #
 from django.contrib.auth.models import User   #
 from django.contrib.auth import login, authenticate, logout   #
 from django.contrib import messages                  #
-from django.contrib.auth.decorators import login_required   #
+from django.contrib.auth.decorators import login_required, permission_required   #
 
 def main(request):
 	return HttpResponse('Crud_one')
@@ -86,8 +86,25 @@ def page_delete(request):
 		model.delete()
 	return redirect('page')
 	
+@login_required
 def admin(request):
-	return render(request, 'crud_one/admin.html')
+	if request.user.is_superuser: 
+		return render(request, 'crud_one/admin.html')
+	else:
+		messages.error(request, 'you are not admin')
+		return redirect('page')
 
+@login_required
 def admin_process(request):
 	return HttpResponse('admin_process')
+
+@login_required
+def cook(request):
+	if request.COOKIES.get('cook'):
+		return HttpResponse('The cookie is still acitve for 5s')
+	else:
+		response = HttpResponse()
+		response.write('Cookie was unset but now it is. Reload the page')
+		response.set_cookie(key='cook', value = 1, max_age=5)
+		return response
+

@@ -14,4 +14,5 @@ urlpatterns = [
 	path('page/delete', views.page_delete),
 	path('admin', views.admin),
 	path('admin/process', views.admin_process),
+	path('cookie', views.cook),
 ]
